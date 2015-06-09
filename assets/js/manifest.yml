@@ -1,0 +1,11 @@
+- jquery-1.11.3.min.js
+- events.js
+- video-object.js
+- play-head-binder.js
+- play-bar.js
+- segment-analyzer.js
+- playback-analyzer.js
+- video-player.js
+- main.js
+
+
