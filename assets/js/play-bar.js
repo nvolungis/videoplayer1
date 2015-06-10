@@ -42,6 +42,10 @@
       this.trigger('progress:bar:clicked', percentage);
     },
 
+    onPlayBarMouseup: function(e){
+      
+    },
+
     createPlayHeadDragger: function(e){
       var data = {
         playerWidth: this.$container.width(),        

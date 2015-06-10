@@ -6,11 +6,18 @@ base()
 body
   padding: 50px
 
+  .max-width
+    margin 0 auto
+    max-width 1200px
+
+  .headling 
+    text-align center 
+
   .neils-video-container
     position relative
-    display: inline-block
 
     video
+      width 100%
       display block 
 
   .neils-video-play-bar
@@ -63,8 +70,12 @@ body
       &[data-played=\"{i}\"]
         background rgba(255, 0, 0, (i/10))
       
+.stats
+  margin-top 10px
 
-  
+  &.exceeded
+    color red
+ 
 
 
 

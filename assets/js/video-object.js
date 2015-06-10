@@ -4,15 +4,11 @@
     this.src         = src;
     this.$container  = $container;
     this.videoLength = 0;
-    this.init();
+    this.embed_video();
+    this.bind();
   }
 
   $.extend(VideoObject.prototype, $.eventEmitter, {
-    init: function(){
-      this.embed_video();
-      this.bind();
-    }, 
-
     bind: function(){
       this.nativeVideoEl.addEventListener('canplay',    this.onCanPlay.bind(this));
       this.nativeVideoEl.addEventListener('timeupdate', this.onTimeUpdate.bind(this));
@@ -32,6 +28,7 @@
 
     onCanPlay: function(){
       this.videoLength = this.nativeVideoEl.duration;
+      this.trigger('can:play');
     },
 
     onTimeUpdate: function(e){
@@ -61,10 +58,12 @@
     },
 
     pauseVideo: function(){
+      console.log('pause video');
       this.nativeVideoEl.pause();
     },
 
     playVideo: function(){
+      console.log('play video');
       if(this.nativeVideoEl.paused || this.nativeVideoEl.ended){
         this.nativeVideoEl.play();
       }
