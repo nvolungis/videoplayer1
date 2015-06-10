@@ -9,6 +9,7 @@
     this.segments = [];
     this.percentWatched = 0;
     this.percentRewatched = 0;
+
     this.addHeatmap();
     this.addStats();
     this.bind();
@@ -16,9 +17,9 @@
 
   $.extend(SegmentAnalyzer.prototype, $.eventEmitter, {
     bind: function(){
-      this.on('new:percentage:watched', this.onNewPercentageWatched.bind(this));
+      this.on('new:percentage:watched',   this.onNewPercentageWatched.bind(this));
       this.on('new:percentage:rewatched', this.onNewPercentageRewatched.bind(this));
-      this.on('threshold:exceeded', this.onThresholdExceeded.bind(this));
+      this.on('threshold:exceeded',       this.onThresholdExceeded.bind(this));
     },
 
     onThresholdExceeded: function(){
@@ -30,7 +31,7 @@
     },
 
     onNewPercentageRewatched: function(){
-      if(this.percentageRewatched >= 25 && !this.thresholdExceeded){
+      if(this.percentRewatched >= this.options.rewatchThreshold && !this.thresholdExceeded){
         this.thresholdExceeded = true;
         this.trigger('threshold:exceeded');
       }
@@ -214,7 +215,8 @@
 
     getDefaultOptions: function(options){
       var defaults = {
-        granularity: .75 
+        granularity: .75,
+        rewatchThreshold: 25
       };
 
       return $.extend({}, defaults, options);
