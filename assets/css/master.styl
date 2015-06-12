@@ -64,11 +64,23 @@ body
   .heatmap-moment
     position absolute
     height 100%
-    background rgba(255, 0, 0, .05)
+    background rgba(0, 0, 0, .05)
 
-    for i in (1..10)
+    &[data-played="1"]
+      background #f4eb8c 
+
+    &[data-played="2"]
+      background #f5d371 
+
+    &[data-played="3"]
+      background #f4b264 
+
+    &[data-played="4"]
+      background #f8875f 
+
+    for i in (5..15)
       &[data-played=\"{i}\"]
-        background rgba(255, 0, 0, (i/10))
+        background #ea5849 
       
 .stats
   margin-top 10px
