@@ -1,36 +1,37 @@
 # Wistia Video Player
+Hi ladies and gents! Below are my thoughts and responses on the video player project. I found it fun, challeneging, and an all around good time. 
 
-## Most challenging Aspects. 
 
-I had built something akin to a video player before so I was aware of the challenges  concerning progress bars – specifically how they  can both influence, and be influenced by another object. I'd say there were two big obstacles to overcome:
+## Most challenging Aspects
+
+I had built something akin to a video player before so I was aware of the obstacles concerning progress bars – specifically how they behave as both slave and master. On the analytics side, two challeneges stand out:
+
 
 ### 1 - Building the segments representing continuous views
 
-the biggest issue here was determining what constituted a segment view. I arrived at a definiton that was anything between a play event and a pause/stop event. this was also the first time I got burned by callback ordering. I like to use events to communicate between the different modules in my code, but this time I had so many events and their ordering was so important that I actually got burned by the technique. The logical order that I assumed the callbacks would fire in did not end up being a reality. I didn't take the time to deeply investigate why this was the case, it very well could have been a flaw in my own logic, but moving those important callbacks into direct method invokations solved the problem.
+The biggest issue here was determining what constituted a segment view and then accurately recording them. I arrived at a definiton that was: anything recorded between a play event and a pause/stop event is a view-segment. In the player, events are flying around frequently – sometimes many a second. I like using events to communicate between different modules in my code, but this time I had so many events and their ordering was so important that I actually got burned by the technique. The logical order that I assumed the callbacks would fire in did not end up being a reality. Not sure if it was an issue with the event loop, my event dispatcher or just my logic, but my "end segment" event was arriving too late to yeild the correct result. In the interest of time I decided to just change the way I was dispatching the event, moving those important callbacks into direct method invokations solved the problem. I would like to look into it a bit further though. 
 
 ### 2 - Determining the best way to derive meaning from those segments.
 
-My initial approach to the analtics problem was to compare continuously viewed segments (we'll call them view-segments) to each other, detecting their overlap lengths and using that data to build a table which I could thhen further analyze. The issue with this however is that not only did I have to detect IF they overlapped, I also had to detect by how much, where exactly that time was, and ultimately how many other segments were already overlapping in that space. That seemed really messy, and it also didn't seem like it would scale well – What if I wanted to know what percentage of the video that was viewed 3 times? n times?
+My initial approach to the analytics problem was to compare continuously viewed segments (we'll call them *view-segments*) to each other, detecting their overlapping portions, and using that data to build a table which I could then further analyze. The issue with this however is that not only did I have to detect *IF* they overlapped, I also had to detect by how much, where exactly that overlap was in time, and ultimately how many other segments were already overlapping in that space. That seemed really messy, and it also didn't seem like it would scale well – What if I wanted to know what percentage of the video that was viewed 3 times? n times?
 
-Then I started thinking – its not really overlaps that we care about here, its whether a specific moment was viewed or not. I could keep track of all the moments in the video in the form of segments which we'll call moment-segments (start of the moment to end of the momnent) then if a segment overlapped a view-segment, we know that moment was watched! Detecting the overlaps was easy because we can just test if they don't overlap, then return the inverse. Better still, detecting different numbers of rewatches became trivial – any time an overlap is detected, just increment that moment's play count! 
+Then I started thinking – it's not really overlaps that we care about here, its whether a specific moment was viewed or not. I could keep track of all the moments in the video in the form of segments which we'll call *moment-segments* (start of the moment to end of the moment) then if a moment-segment overlapped a view-segment, we'd know that moment was watched! Detecting the overlaps was easy because we could just test if they don't overlap, then return the inverse. Better still, detecting different numbers of rewatches became trivial – any time an overlap was detected, we'd just increment that moment's play count! 
 
-to get a percentage of moments watched n times, just find all moments with a play count >= n and divide by the total number of moments. 
+To get a percentage of moments watched n times, just find all moments with a play count >= n and divide by the total number of moments. 
 
 
 ### Drawbacks
-if exact accuracy was a requirement, this approach would not work. The very act of splitting the video up into segments means that we can only gather data as granular as those segments. Of course we have the ability to set that granularity to anything we want, but at some point the performance would likely force a different solution potentially more along the lines of my initial approach. 
+If more percise accuracy was a requirement, this approach would not work. The very act of splitting the video up into segments means that we can only gather data as granular as those segments are defined. Of course we have the ability to set that granularity to anything we want, but at some point the performance would likely force a different solution – potentially more along the lines of my initial approach. 
 
-The percentage calculation is also almost guaranteed to be a little bit off. Since it's likely that the length of a video will not be evenly divisible by the chosen moment-segemnt legnth, the last moment-segment of any run of this algorithm will not be the same as all the others. Thus using just the number of segments played / total segments will be slightly off, the severity of which depends on (video length in seconds % num segments per second) and the number of moment-segments that get generated.
+The percentage calculation is also almost guaranteed to be a little bit off. Since it's likely that the length of a video will not be evenly divisible by the chosen moment-segment legnth, the last moment-segment of any run of this algorithm will almost always be different from the others. Thus using just the number of moment-segments played / total segments will be slightly off, the severity of which depends on (video length in seconds % num segments per second) and the number of moment-segments that get generated.
 
-Since we are dealing with video here and not self-driving cars or anything that could kill you I think this tradeoff is worth it. The clarity of the algorithm, as well as the flexibility to track an arbitrary number of rewatches for me was worth it for me. 
-
+The clarity of the algorithm, as well as the flexibility to track an arbitrary number of rewatches seemed like a fair tradeoff for more precision in this case.
 
 ### What was new to me
-Prior to this project I had limited experience with the video tag. I esentially only used it for background videos on websites and didn't much care about anything other than its canplay event.  
-I also hadn't built an algorithm to collect information like this, so that was fun. 
+Prior to this project I had limited experience with the video tag. I essentially only used it for background videos on websites and didn't much care about anything other than its canplay event. I also hadn't built an algorithm to collect information like this, so that was fun and new.
 
 ### What I would change
-I almost always want to make my code more modular. I think I did an okay job here, but the boundaries maybe weren't drawn as well as the should have been. One thing I noted was having to reach into my video object (wraps the native video object) and pull out the duraiton to pass through to other modules. That felt a little funky. 
+I'm always driving toward more modular code with logically derived boundaries. I think I did an okay job here, but the boundaries maybe weren't drawn as well as the should have been. One thing I noted was having to reach into my video object (wraps the native video object) and pull out the duraiton to pass through to other modules. That felt a little funky. 
 
 If this were a real player, I also wouldn't want to depend on jquery. I learn hard on the $ for my event bus, but if there were real reasons not to use jquery I'd say pulling that would would on the list. 
 
