@@ -13,7 +13,6 @@
   function PlayHeadDragger(envData){
     this.currentPercentage = 0;
     this.envData           = envData;
-    this.gutter            = 10;
 
     this.bind();
   }
@@ -41,9 +40,9 @@
     },
 
     getPercentage: function(clientX){
-      var adjustedClientX = (10 - this.envData.offsetX) + clientX,
-          numerator       = adjustedClientX - (this.envData.playerOffsetX + this.gutter),
-          denominator     = this.envData.playerWidth - (this.gutter * 2),
+      var adjustedClientX = (this.envData.gutter - this.envData.offsetX) + clientX,
+          numerator       = adjustedClientX - (this.envData.playerOffsetX + this.envData.gutter),
+          denominator     = this.envData.playerWidth - (this.envData.gutter * 2),
           percentage      = (numerator / denominator) * 100;
 
       if(percentage < 0){

@@ -13,6 +13,7 @@
   function PlayBar(prefix, container){
     this.prefix    = prefix; 
     this.container = container;
+    this.playHeadWidth = 10;
 
     this.init();
   }
@@ -60,7 +61,8 @@
         playerOffsetX: this.container.getBoundingClientRect().left,
         playHeadWidth: this.playHead.offsetWidth,
         clientX:e.clientX,
-        offsetX:e.offsetX
+        offsetX:e.offsetX,
+        gutter: this.playHeadWidth / 2
       };
 
       this.playHeadDragger = new PlayHeadDragger(data);
@@ -114,10 +116,13 @@
       progressBar.setAttribute('class', this.prefix + '-progress-bar');
 
       playHead.setAttribute('class', this.prefix + '-play-head');
+      playHead.style.width = this.playHeadWidth + 'px';
+      playHead.style.right = - (this.playHeadWidth / 2) + 'px';
       this.playHead = playHead;
 
       playHeadLabel.setAttribute('class', this.prefix + '-play-head-label');
       this.playHeadLabel = playHeadLabel;
+      this.playHeadLabel.style.right = (this.playHeadWidth) + 'px';
       playHead.appendChild(playHeadLabel);
 
       progressBar.appendChild(playHead);

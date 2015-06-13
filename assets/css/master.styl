@@ -3,6 +3,8 @@
 normalize-css()
 base()
 
+height = 40px
+
 .neils-video-container
   position relative
 
@@ -13,7 +15,7 @@ base()
 .neils-video-play-bar
   position relative
   width 100%
-  height 40px
+  height height
   box-sizing border-box
   overflow hidden
   cursor pointer
@@ -41,9 +43,7 @@ base()
 
 .neils-video-play-head
   position absolute
-  right: -10px
   height 100%
-  width 20px
   background black
   cursor grab
 
@@ -52,8 +52,10 @@ base()
 
 .neils-video-play-head-label
   position absolute
-  right 25px
-  top 11px
+  top 0
+  padding 0 5px;
+  height 100%
+  line-height height
   color white
 
 .neils-video-heatmap
