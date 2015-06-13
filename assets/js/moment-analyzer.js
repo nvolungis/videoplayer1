@@ -1,21 +1,24 @@
-(function($, window){
-  function SegmentAnalyzer(duration, options){
-    this.duration = duration;
-    this.options  = this.getDefaultOptions(options);
+(function(utils, document, window){
+  function MomentAnalyzer(duration, container, options){
+    this.duration                   = duration;
+    this.container                  = container;
+    this.options                    = options;
     this.current_segment_moments    = this.getMoments();
     this.aggregate_segment_moments  = this.getMoments(); 
-    this.totalMoments = this.aggregate_segment_moments.length;
-    this.thresholdExceeded = false;
-    this.segments = [];
-    this.percentWatched = 0;
-    this.percentRewatched = 0;
+    this.totalMoments               = this.aggregate_segment_moments.length;
+    this.thresholdExceeded          = false;
+    this.segments                   = [];
+    this.percentWatched             = 0;
+    this.percentRewatched           = 0;
 
-    this.addHeatmap();
-    this.addStats();
+    if(this.options.showStats){
+      this.ui = new MomentAnalyzerUI(this.duration, container, this.aggregate_segment_moments, this.options)
+    }
+    
     this.bind();
   }
 
-  $.extend(SegmentAnalyzer.prototype, $.eventEmitter, {
+  utils.extend(MomentAnalyzer.prototype, utils.emitter, {
     bind: function(){
       this.on('new:percentage:watched',   this.onNewPercentageWatched.bind(this));
       this.on('new:percentage:rewatched', this.onNewPercentageRewatched.bind(this));
@@ -23,29 +26,29 @@
     },
 
     onThresholdExceeded: function(){
-      $('.stats-rewatched').addClass('exceeded');
+      console.log(this.options.rewatchThreshold + ' exceeded!');
+
+      if(this.ui){
+        this.ui.showThresholdExceeded();
+      }
     },
 
     onNewPercentageWatched: function(){
-      $('.stats-watched-value').html(this.percentWatched.toFixed(2) + '%');
+      if(this.ui){
+        this.ui.updatePercentageWatched(this.percentWatched);
+      }
     },
 
     onNewPercentageRewatched: function(){
+      var el, valueRewatched;
       if(this.percentRewatched >= this.options.rewatchThreshold && !this.thresholdExceeded){
         this.thresholdExceeded = true;
         this.trigger('threshold:exceeded');
       }
 
-      $('.stats-rewatched-value').html(this.percentRewatched.toFixed(2) + '%');
-    },
-
-    updateHeatmap: function(indexes, sum){
-      var moment;
-
-      indexes.forEach(function(moment_index){
-        moment = sum[moment_index];
-        moment.$el.attr('data-played', moment.plays);
-      });
+      if(this.ui){
+        this.ui.updatePercentageRewatched(this.percentRewatched);
+      }
     },
 
     calculatePercentagesWatched: function(sums){
@@ -93,7 +96,7 @@
           sum = [];
 
       for(moment in this.aggregate_segment_moments){
-        sum[moment] = $.extend({}, this.aggregate_segment_moments[moment]);
+        sum[moment] = utils.extend({}, this.aggregate_segment_moments[moment]);
         sum[moment].plays += this.current_segment_moments[moment].plays;
       }
 
@@ -124,8 +127,11 @@
       }
 
       sum = this.sumMoments();
-      this.updateHeatmap(updated, sum);
       this.calculatePercentagesWatched(sum);
+
+      if(this.ui){
+        this.ui.updateHeatmap(updated, sum);
+      }
     },
 
     overlap: function(segA, segB){
@@ -158,71 +164,10 @@
       });
 
       return moments;
-    },
-
-    addHeatmap: function(){
-      var $container = $('#video'),
-          $heatmap = $('<div />'),
-          $elBase = $('<div />'),
-          currentLeft = 0;
-
-      $elBase.addClass('heatmap-moment');
-      $heatmap.addClass('heatmap');
-
-      this.aggregate_segment_moments.forEach(function(moment){
-        var $el = $elBase.clone(),
-        width = ((moment.end - moment.start) / this.duration) * 100;
-
-        this.aggregate_segment_moments[moment.index].$el = $el;
-
-        $el.css({
-          width: width + '%',
-          left: currentLeft + '%'
-        });
-
-        $el.attr({
-          "data-index": moment.index
-        });
-
-        currentLeft += width;
-        $heatmap.append($el);
-      }.bind(this));
-
-      $container.append($heatmap);
-    },
-
-    addStats: function(){
-      var $container = $("#video"),
-          $stats = $('<div />'),
-          $label = $('<span />'),
-          $value = $('<span />');
-
-      ['watched', 'rewatched'].forEach(function(item){
-        var $statsclone = $stats.clone(),
-            $labelclone = $label.clone(),
-            $valueclone = $value.clone();
-
-        $statsclone.addClass('stats stats-'+ item);
-        $labelclone.addClass('stats-' + item + '-label').html('Percentage ' + item + ': ');
-        $valueclone.addClass('stats-' + item + '-value').html('0.00%');
-
-        $statsclone.append($labelclone);
-        $statsclone.append($valueclone);
-
-        $container.append($statsclone);
-      });
-    },
-
-    getDefaultOptions: function(options){
-      var defaults = {
-        granularity: .75,
-        rewatchThreshold: 25
-      };
-
-      return $.extend({}, defaults, options);
     }
+
   });
 
-  window.SegmentAnalyzer = SegmentAnalyzer;
+  window.MomentAnalyzer = MomentAnalyzer;
 
-}(jQuery, window));
+}(utils, document, window));

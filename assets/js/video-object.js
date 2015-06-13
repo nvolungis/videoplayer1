@@ -1,21 +1,23 @@
-(function($, window){
-  function VideoObject(prefix, src, $container){
+//jquery free!
+
+(function(utils, document, window){
+  function VideoObject(prefix, src, container){
     this.prefix      = prefix;
     this.src         = src;
-    this.$container  = $container;
+    this.container   = container;
     this.videoLength = 0;
     this.embed_video();
     this.bind();
   }
 
-  $.extend(VideoObject.prototype, $.eventEmitter, {
+  utils.extend(VideoObject.prototype, utils.emitter, {
     bind: function(){
       this.nativeVideoEl.addEventListener('canplay',    this.onCanPlay.bind(this));
       this.nativeVideoEl.addEventListener('timeupdate', this.onTimeUpdate.bind(this));
       this.nativeVideoEl.addEventListener('play',       this.onPlay.bind(this)); 
       this.nativeVideoEl.addEventListener('pause',      this.onPause.bind(this));
       this.nativeVideoEl.addEventListener('stop',       this.onStop.bind(this));
-      this.$videoTag.on('click', this.onVideoTagClick.bind(this));
+      this.nativeVideoEl.addEventListener('click',      this.onVideoTagClick.bind(this));
     },
 
     onVideoTagClick: function(){
@@ -42,6 +44,9 @@
 
     onPlay: function(){
       this.trigger('play');
+
+      // the time update handler here to catch beginning moments of videos with very high segment granularity.
+      this.onTimeUpdate();
     },
 
     onPause: function(){
@@ -58,12 +63,10 @@
     },
 
     pauseVideo: function(){
-      console.log('pause video');
       this.nativeVideoEl.pause();
     },
 
     playVideo: function(){
-      console.log('play video');
       if(this.nativeVideoEl.paused || this.nativeVideoEl.ended){
         this.nativeVideoEl.play();
       }
@@ -74,26 +77,22 @@
     },
 
     embed_video: function(){
-      var $videoTag = $('<video />'),
-          $videoSrc = $('<source />');
+      var videoTag = document.createElement('video'),
+          videoSrc = document.createElement('source');
 
-      $videoTag.attr({
-        autoplay: 1,
-      });
+      videoTag.setAttribute('autoplay', 1);
+      videoTag.id = this.container.id + '-VIDEO';
+      videoSrc.setAttribute('src', this.src);
+      videoSrc.setAttribute('type', 'video/mp4');
 
-      $videoSrc.attr({
-        src: this.src,
-        type: "video/mp4"
-      });
+      videoTag.appendChild(videoSrc);
 
-      $videoTag.append($videoSrc);
-
-      this.$videoTag = $videoTag;
-      this.$container.append($videoTag);
-      this.nativeVideoEl = $videoTag[0]
+      this.container.appendChild(videoTag);
+      this.nativeVideoEl = this.container.querySelector('video')
+      console.log(this.nativeVideoEl);
     }
   });
 
   window.VideoObject = VideoObject;
 
-}(jQuery, window));
+}(utils, document, window));

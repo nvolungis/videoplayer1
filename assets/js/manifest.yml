@@ -1,9 +1,10 @@
-- jquery-1.11.3.min.js
-- events.js
+- utils.js
+- emitter.js
 - video-object.js
 - play-head-binder.js
 - play-bar.js
-- segment-analyzer.js
+- moment-analyzer.js
+- moment-analyzer-ui.js
 - playback-analyzer.js
 - video-player.js
 - main.js

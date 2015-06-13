@@ -1,33 +1,34 @@
-(function($, PlayHeadBinder, window){
-  function PlayBar(prefix, $container){
+//jquery free!!
+
+(function(PlayHeadBinder, utils, document, window){
+  function PlayBar(prefix, container){
     this.prefix = prefix; 
-    this.$container = $container;
+    this.container = container;
+    this.global_event_initiator;
     this.init();
   }
 
-  $.extend(PlayBar.prototype, $.eventEmitter, {
+  utils.extend(PlayBar.prototype, utils.emitter, {
     init: function(){
       this.embedPlayBar();
       this.bind();
     },
 
     bind: function(){
-      this.bindVideoProgress();
-      this.$playHead.on('mousedown', this.onPlayHeadMousedown.bind(this));
-      this.$playHead.on('click',     this.onPlayHeadClick.bind(this));
-      this.$playBar.on('click',      this.onPlayBarClick.bind(this));
-      $(window).on('mouseup',        this.onMouseup.bind(this));
+      this.playHead.addEventListener('mousedown', this.onPlayHeadMousedown.bind(this));
+      this.playHead.addEventListener('click',     this.onPlayHeadClick.bind(this));
+      this.playBar.addEventListener('click',      this.onPlayBarClick.bind(this));
+      this.on('video:made:progress',              this.onVideoProgress.bind(this));
+      window.addEventListener('mouseup',          this.onMouseup.bind(this));
     },
 
     onPlayHeadMousedown: function(e){
       this.trigger('play:head:startdrag');
-      this.unbindVideoProgress();
       this.createPlayHeadDragger(e);
     },
 
     onMouseup: function(e){
       if(!this.playHeadBinder) return;
-      this.bindVideoProgress();
       this.destroyPlayHeadDragger();
       this.trigger('play:head:enddrag');
     },
@@ -38,19 +39,15 @@
     },
 
     onPlayBarClick: function(e){
-      var percentage = (e.clientX - this.$container.offset().left) / this.$container.width() * 100;
+      var percentage = (e.clientX - this.container.getBoundingClientRect().left) / this.container.offsetWidth * 100;
       this.trigger('progress:bar:clicked', percentage);
-    },
-
-    onPlayBarMouseup: function(e){
-      
     },
 
     createPlayHeadDragger: function(e){
       var data = {
-        playerWidth: this.$container.width(),        
-        playerOffsetX: this.$container.offset().left,
-        playHeadWidth: this.$playHead.width(),
+        playerWidth: this.container.offsetWidth,
+        playerOffsetX: this.container.getBoundingClientRect().left,
+        playHeadWidth: this.playHead.offsetWidth,
         clientX:e.clientX,
         offsetX:e.offsetX
       };
@@ -68,68 +65,59 @@
     onNewTargetPercentage: function(e, percentage){
       this.trigger('play:head:dragged', percentage);
       this.updateProgressBar(percentage);
-      console.log('log current time here');
     },
 
-    bindVideoProgress: function(){
-      this.on('video:made:progress', this.onVideoProgress.bind(this));
-    },
-
-    unbindVideoProgress: function(){
-      this.off('video:made:progress');
-    },
 
     onVideoProgress: function(e, data){
-      this.updateProgressBar(data.percentage);
       this.updateHeadLabel(data.currentTime);
+
+      if(this.playHeadBinder) return;
+      this.updateProgressBar(data.percentage);
     },
 
     updateProgressBar: function(percentage){
-      this.$progressBar.css({
-        width: percentage + '%'
-      });
+      var style = this.progressBar.style;
+      style.width = percentage + '%';
     },
 
     updateHeadLabel: function(currentTime){
-      // console.log('update head label', currentTime);
+      var secs = parseInt(currentTime),
+          mins = Math.floor(secs / 60),
+          display_secs = secs - (mins * 60),
+          time = mins + ':' + ("0" + display_secs).slice(-2);
+
+       this.playHeadLabel.innerHTML = time;
     },
 
     embedPlayBar: function(){
-      var $playBar = $('<div />'),
-          $playBarPositioner = $('<div />'),
-          $progressBar = $('<div />'),
-          $playHead = $('<div />');
+      var playBar           = document.createElement('div'),
+          playBarPositioner = document.createElement('div'),
+          progressBar       = document.createElement('div'),
+          playHead          = document.createElement('div'),
+          playHeadLabel     = document.createElement('div');
 
-      $playBar.attr({
-        class: this.prefix + '-play-bar'
-      });
+      playBar.setAttribute('class', this.prefix + '-play-bar');
+      this.playBar = playBar;
 
-      this.$playBar = $playBar;
+      playBarPositioner.setAttribute( 'class', this.prefix + '-play-bar-positioner');
 
-      $playBarPositioner.attr({
-        class: this.prefix + '-play-bar-positioner'
-      });
+      progressBar.setAttribute('class', this.prefix + '-progress-bar');
 
-      $progressBar.attr({
-        class: this.prefix + '-progress-bar'
-      });
+      playHead.setAttribute('class', this.prefix + '-play-head');
+      this.playHead = playHead;
 
-      $playHead.attr({
-        class: this.prefix + '-play-head'
-      });
+      playHeadLabel.setAttribute('class', this.prefix + '-play-head-label');
+      this.playHeadLabel = playHeadLabel;
+      playHead.appendChild(playHeadLabel);
 
-      this.$playHead = $playHead;
+      progressBar.appendChild(playHead);
+      this.progressBar = progressBar;
 
-      $progressBar.append($playHead);
-      this.$progressBar = $progressBar;
-
-      $playBarPositioner.append($progressBar);
-
-      $playBar.append($playBarPositioner);
-
-      this.$container.append($playBar);
+      playBarPositioner.appendChild(progressBar);
+      playBar.appendChild(playBarPositioner);
+      this.container.appendChild(playBar);
     }
   });
 
   window.PlayBar = PlayBar;
-}(jQuery, PlayHeadBinder, window ));
+}(PlayHeadBinder, utils, document, window ));

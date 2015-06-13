@@ -1,4 +1,6 @@
-(function($, window){
+//jquery free!!
+
+(function(utils, window){
 
   function PlayHeadBinder(envData){
     this.envData = envData;
@@ -7,13 +9,13 @@
     this.gutter = 10;
   }
 
-  $.extend(PlayHeadBinder.prototype, $.eventEmitter, {
+  utils.extend(PlayHeadBinder.prototype, utils.emitter, {
     bind: function(){
-      $(window).on('mousemove.playheadbinder', this.onMouseMove.bind(this));
+      window.addEventListener('mousemove', this.onMouseMove.bind(this));
     },
 
     unbind: function(){
-      $(window).off('mousemove.playheadbinder');
+      window.removeEventListener('mousemove');
     },
 
     onMouseMove: function(e){
@@ -45,4 +47,4 @@
 
   window.PlayHeadBinder = PlayHeadBinder;
 
-}(jQuery, window));
+}(utils, window));

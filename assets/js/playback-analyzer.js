@@ -1,11 +1,14 @@
-(function($, SegmentAnalyzer, window){
-  function PlaybackAnalyzer(duration){
+//jquery free!!
+
+(function(MomentAnalyzer, utils, window){
+  function PlaybackAnalyzer(duration, container, options){
     this.canRecord       = false;
     this.currentSegment  = {};
-    this.segmentAnalyzer = new SegmentAnalyzer(duration);
+    this.options         = this.getDefaultOptions(options);
+    this.momentAnalyzer = new MomentAnalyzer(duration, container, options);
   }
 
-  $.extend(PlaybackAnalyzer.prototype, $.eventEmitter, {
+  utils.extend(PlaybackAnalyzer.prototype, {
     record: function(data){
       if(!this.canRecord) return;
 
@@ -14,11 +17,11 @@
 
       }else if(this.currentSegment.end == undefined){
         this.currentSegment.end = data.currentTime;
-        this.segmentAnalyzer.addSegment(this.currentSegment);
+        this.momentAnalyzer.addSegment(this.currentSegment);
 
       }else{
         this.currentSegment.end = data.currentTime;
-        this.segmentAnalyzer.updateLastSegment(this.currentSegment);
+        this.momentAnalyzer.updateLastSegment(this.currentSegment);
       }
     },
 
@@ -29,10 +32,16 @@
     disableRecording: function(){
       this.canRecord = false;
       this.currentSegment = {};
+    },
+
+    getDefaultOptions: function(options){
+      var defaults = {};
+
+      return utils.extend({}, defaults, options);
     }
   });
 
   window.PlaybackAnalyzer = PlaybackAnalyzer;
-}(jQuery, SegmentAnalyzer, window));
+}(MomentAnalyzer, utils, window));
 
 
