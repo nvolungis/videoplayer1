@@ -1,3 +1,18 @@
+
+
+/* MomentAnalyzer
+ *
+ * Creates an array of objects that represent discrete moments 
+ * in the video the length of which are determined by videoDuration / granularity
+ * where granularity is 1 / numberSegmentsPerSecond. Moment objects contain start, 
+ * end and plays properties. The analyzer compares a segment of the video representing
+ * the current unintereupted portion of the video being viewed to each moment object.
+ * If the segments overlap, the play count for that moment in incremented. This info
+ * is then used to derive percentages watched, rewatched, tripple watched, etc. 
+ *
+ */
+
+
 (function(utils, document, window){
   function MomentAnalyzer(duration, container, options){
     this.duration                   = duration;
@@ -40,7 +55,9 @@
     },
 
     onNewPercentageRewatched: function(){
-      var el, valueRewatched;
+      var valueRewatched,
+          el;
+
       if(this.percentRewatched >= this.options.rewatchThreshold && !this.thresholdExceeded){
         this.thresholdExceeded = true;
         this.trigger('threshold:exceeded');
@@ -56,7 +73,7 @@
           percentWatched,
           percentRewatched;
 
-      momentsWatched = sums.reduce(function(memo, curr, i, arr){
+      momentsWatched = sums.reduce(function(memo, curr){
         if(curr.plays > 0){
           memo.once += 1;
         }
@@ -92,8 +109,8 @@
     },
 
     sumMoments: function(){
-      var moment,
-          sum = [];
+      var sum = [],
+          moment;
 
       for(moment in this.aggregate_segment_moments){
         sum[moment] = utils.extend({}, this.aggregate_segment_moments[moment]);
@@ -114,8 +131,9 @@
 
     analyze: function(){
       var lastSegment = this.lastSegment(),
-          updated = [],
-          moment, sum;
+          updated     = [],
+          moment, 
+          sum;
 
       for( moment in this.current_segment_moments ){
         if(this.overlap(this.current_segment_moments[moment], lastSegment)){
@@ -141,8 +159,8 @@
 
     getMoments: function(){
       var currentTime = 0,
-          index = 0,
-          moments = [];
+          moments     = [],
+          index       = 0;
 
       while((currentTime + this.options.granularity) < this.duration){
         moments.push({

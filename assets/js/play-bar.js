@@ -1,10 +1,19 @@
-//jquery free!!
 
-(function(PlayHeadBinder, utils, document, window){
+
+/* PlayBar
+ * 
+ * Creates and adds a playBar to the container argument.
+ * Accepts data for updating the bar to the current video position, 
+ * and also sends data to its instantiator on click and playhead drag.
+ *
+ */
+
+
+(function(PlayHeadDragger, utils, document, window){
   function PlayBar(prefix, container){
-    this.prefix = prefix; 
+    this.prefix    = prefix; 
     this.container = container;
-    this.global_event_initiator;
+
     this.init();
   }
 
@@ -23,12 +32,14 @@
     },
 
     onPlayHeadMousedown: function(e){
+      this.playHead.setAttribute('data-is-dragging', true)
       this.trigger('play:head:startdrag');
       this.createPlayHeadDragger(e);
     },
 
     onMouseup: function(e){
-      if(!this.playHeadBinder) return;
+      if(!this.playHeadDragger) return;
+      this.playHead.setAttribute('data-is-dragging', false)
       this.destroyPlayHeadDragger();
       this.trigger('play:head:enddrag');
     },
@@ -52,14 +63,14 @@
         offsetX:e.offsetX
       };
 
-      this.playHeadBinder = new PlayHeadBinder(data);
-      this.playHeadBinder.on('new:target:percentage', this.onNewTargetPercentage.bind(this));
+      this.playHeadDragger = new PlayHeadDragger(data);
+      this.playHeadDragger.on('new:target:percentage', this.onNewTargetPercentage.bind(this));
     },
 
     destroyPlayHeadDragger: function(){
-      this.playHeadBinder.off('new:target:percentage');
-      this.playHeadBinder.destroy();
-      delete this.playHeadBinder;
+      this.playHeadDragger.off('new:target:percentage');
+      this.playHeadDragger.destroy();
+      delete this.playHeadDragger;
     },
 
     onNewTargetPercentage: function(e, percentage){
@@ -67,11 +78,10 @@
       this.updateProgressBar(percentage);
     },
 
-
     onVideoProgress: function(e, data){
       this.updateHeadLabel(data.currentTime);
 
-      if(this.playHeadBinder) return;
+      if(this.playHeadDragger) return;
       this.updateProgressBar(data.percentage);
     },
 
@@ -81,10 +91,10 @@
     },
 
     updateHeadLabel: function(currentTime){
-      var secs = parseInt(currentTime),
-          mins = Math.floor(secs / 60),
+      var secs         = parseInt(currentTime),
+          mins         = Math.floor(secs / 60),
           display_secs = secs - (mins * 60),
-          time = mins + ':' + ("0" + display_secs).slice(-2);
+          time         = mins + ':' + ("0" + display_secs).slice(-2);
 
        this.playHeadLabel.innerHTML = time;
     },
@@ -120,4 +130,4 @@
   });
 
   window.PlayBar = PlayBar;
-}(PlayHeadBinder, utils, document, window ));
+}(PlayHeadDragger, utils, document, window ));

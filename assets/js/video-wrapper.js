@@ -1,16 +1,27 @@
-//jquery free!
+
+
+/* VideoWrapper
+ * 
+ * Creates and adds a video object and adds it to the container argument.
+ * Hooks up to the native video events and exposes a more tailored
+ * api.
+ *
+ */
+
 
 (function(utils, document, window){
-  function VideoObject(prefix, src, container){
-    this.prefix      = prefix;
+  function VideoWrapper(src, container, options){
     this.src         = src;
     this.container   = container;
+    this.options     = options;
     this.videoLength = 0;
-    this.embed_video();
+
+    this.embedVideo();
+    this.updateVolume(this.options.volume);
     this.bind();
   }
 
-  utils.extend(VideoObject.prototype, utils.emitter, {
+  utils.extend(VideoWrapper.prototype, utils.emitter, {
     bind: function(){
       this.nativeVideoEl.addEventListener('canplay',    this.onCanPlay.bind(this));
       this.nativeVideoEl.addEventListener('timeupdate', this.onTimeUpdate.bind(this));
@@ -72,15 +83,22 @@
       }
     },
 
+    updateVolume: function(volume){
+      this.nativeVideoEl.volume = volume;
+    },
+
     currentPercentage: function(){
       return this.nativeVideoEl.currentTime / this.videoLength * 100;
     },
 
-    embed_video: function(){
+    embedVideo: function(){
       var videoTag = document.createElement('video'),
           videoSrc = document.createElement('source');
 
-      videoTag.setAttribute('autoplay', 1);
+      if(this.options.autoplay){
+        videoTag.setAttribute('autoplay', 1);
+      }
+
       videoTag.id = this.container.id + '-VIDEO';
       videoSrc.setAttribute('src', this.src);
       videoSrc.setAttribute('type', 'video/mp4');
@@ -89,10 +107,8 @@
 
       this.container.appendChild(videoTag);
       this.nativeVideoEl = this.container.querySelector('video')
-      console.log(this.nativeVideoEl);
     }
   });
 
-  window.VideoObject = VideoObject;
-
+  window.VideoWrapper = VideoWrapper;
 }(utils, document, window));

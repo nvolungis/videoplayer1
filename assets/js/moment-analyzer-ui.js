@@ -1,27 +1,38 @@
+
+
+/* MomentAnalyzerUI
+ *
+ * Extracts the UI concerns out of the MomentAnalyzer object.
+ *
+ */
+
+
 (function(utils, document, window){
   function MomentAnalyzerUI(duration, container, moments, options){
-    this.duration  = duration;
-    this.container = container; 
-    this.options   = options;
-    this.moments   = moments;
+    this.duration    = duration;
+    this.container   = container; 
+    this.options     = options;
+    this.moments     = moments;
 
     this.addHeatmap();
     this.addStats();
+
+    this.watchedValEl   = this.container.querySelector('.' + this.options.prefix + '-stats-watched-value');
+    this.rewatchedValEl = this.container.querySelector('.' + this.options.prefix + '-stats-rewatched-value');
+    this.rewatchedEl    = this.container.querySelector('.' + this.options.prefix + '-stats-rewatched');
   }
 
   utils.extend(MomentAnalyzerUI.prototype, {
     showThresholdExceeded: function(){
-      this.container.querySelector('.' + this.options.prefix + '-stats-rewatched').className += ' exceeded';
+      this.rewatchedEl.className += ' exceeded';
     },
 
     updatePercentageWatched: function(percentWatched){
-      var valueWatched = this.container.querySelector('.' + this.options.prefix + '-stats-watched-value');
-      valueWatched.innerHTML = percentWatched.toFixed(2) + '%';
+      this.watchedValEl.innerHTML = percentWatched.toFixed(2) + '%';
     },
 
     updatePercentageRewatched: function(percentRewatched){
-      var valueRewatched = this.container.querySelector('.' + this.options.prefix + '-stats-rewatched-value');
-      valueRewatched.innerHTML = percentRewatched.toFixed(2) + '%';
+      this.rewatchedValEl.innerHTML = percentRewatched.toFixed(2) + '%';
     },
 
     updateHeatmap: function(indexes, sum){
@@ -80,8 +91,7 @@
 
         this.container.appendChild(statsclone);
       }.bind(this));
-    },
-
+    }
   });
 
   window.MomentAnalyzerUI = MomentAnalyzerUI;

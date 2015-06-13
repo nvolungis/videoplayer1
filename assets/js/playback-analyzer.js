@@ -1,11 +1,32 @@
-//jquery free!!
+
+
+/* PlaybackAnalyzer
+ *
+ * An interface to sit between the concerns of the player
+ * and the concerns of collecting playback analytics. 
+ * Potentially incorporate other analytics objects here. 
+ *
+ * Exposes three methods:
+ *  
+ * record
+ * Accepts a data object that contains currentPercentage
+ * and currentTime properties
+ *
+ * enableRecording
+ * allow record events to be processes
+ *  
+ * disableRecoding
+ * disallow record events from being processed
+ *
+ */
+
 
 (function(MomentAnalyzer, utils, window){
   function PlaybackAnalyzer(duration, container, options){
     this.canRecord       = false;
     this.currentSegment  = {};
     this.options         = this.getDefaultOptions(options);
-    this.momentAnalyzer = new MomentAnalyzer(duration, container, options);
+    this.momentAnalyzer  = new MomentAnalyzer(duration, container, options);
   }
 
   utils.extend(PlaybackAnalyzer.prototype, {
@@ -43,5 +64,3 @@
 
   window.PlaybackAnalyzer = PlaybackAnalyzer;
 }(MomentAnalyzer, utils, window));
-
-

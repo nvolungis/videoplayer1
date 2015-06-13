@@ -1,7 +1,7 @@
 - utils.js
 - emitter.js
-- video-object.js
-- play-head-binder.js
+- video-wrapper.js
+- play-head-dragger.js
 - play-bar.js
 - moment-analyzer.js
 - moment-analyzer-ui.js
