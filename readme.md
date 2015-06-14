@@ -29,7 +29,7 @@ Hi ladies and gents! Below are my thoughts on the video player project. I found 
     </script>
   </body>
 </html>
-  
+```
 
 ### Required arguments
 #### src
