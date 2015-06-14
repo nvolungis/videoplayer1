@@ -3,11 +3,51 @@ Hi ladies and gents! Below are my thoughts on the video player project. I found 
 
 #### Developed on and tested against chrome =]=]
 
+## How to use it
+
+var videoplayer = embedvideo(src, container, options)
+
+### Required arguments
+**src** - String
+the url of the video in mp4 format    
+
+**container** - String
+the id of the container to append the video to 
+
+### Options
+**granularity** - Double
+from .01 to 1.0
+default .5 
+the number of segments / second to split the video into for analytics
+
+**autoplay** - Boolean
+default true
+autoplay the video, or don't =]
+
+**volume** - Double
+from 0.0 to 1.0
+default 1.0
+sets the volume of the player on initialization
+
+**rewatchTreshold** - Integer
+from 0 to 100
+default 25
+the percentage of the video rewatched required to trigger a thresholdExceeded event
+
+**showStats** - Boolean
+default false
+show the heatmap, or don't (but you should!!)
+
+**prefix** - String
+default 'neils-video' 
+Prefix added to all the elements created by the video player 
+__note__: changing this will break the included style sheet
+
 ## Most challenging aspects
 
 ### 1 - Making the play head draggable
 
-It took lots of playing around and sketches to figure out what was actually happening here. The most difficult part was translating the current x position of the mouse to a percentage based on the scroll bar width. Lots of things have to be take into account, namely the position of the player itself, the play bars dimensions, and how wide the play head is. I ended up with a flexible implementation – I can dynamically set the play head width in code and resize the player's container and everything still works.
+It took lots of playing around and sketches to figure out what was actually happening here. The most difficult part was translating the current x position of the mouse to a percentage based on the scroll bar width. Lots of things have to be take into account, namely the position of the player itself, the play bar's dimensions, and how wide the play head is. I ended up with a flexible implementation – I can dynamically set the play head width in code and resize the player's container and everything still works.
 
 ### 2 - Building the segments representing continuous views
 
@@ -47,6 +87,8 @@ During development I built each of the modules independently in their own files,
 
 It would be nice to expose a more thought out interface for the VideoObject instance returned by the embedvideo function. Adding play, pause, stop, and volume would be at the top of the list so another program could control the player. Adding destroy methods to all my objects would also be a huge win for people embedding in SPAs. 
 
+I could also do a better job of validating the required arguments. If an invalid container id is supplied the player will just error out. Same goes for the src – if the browser can't play the supplied video the player doesn't error out gracefully. 
+
 ### Support
 Since this is an HTML5 player, browsers that don't support html5 video will not display the video. Furthermore since I'm using .addEventListener directly this code would blow up on any broswer that didn't support it (ie8 comes to mind). I'm also using some css3 stuff ( like repeating-linear-gradient ). I can't imagine this working too well on tablets either. I did not factor in any touch event handlers. The player is only provided with one source tag for mp4 format, so this wont work on any browsers that don't support that format ( know old firefox doesn't – are they still only OGG? )
 
@@ -83,5 +125,6 @@ This looks like 2n, or O(n) for each 'timeChanged' event to me.
 ### Thank you!!
 
 This was a great project and I feel like it really let's you see how I code and what I'm about. My number one goal when I'm writing code is to make it as understandable and readable as possible (it's also nice if it actually does stuff!) and I hope that comes through in this project. I can't wait to hear what you have to say about it!
+
 
 - Neil
