@@ -43,7 +43,7 @@ the url of the video in mp4 format
 #### showStats
 - Boolean
 - default false
-- show the heatmap, or don't (but you should!!)
+- displays watch and rewatch percentages as well as a heatmap of the most rewatched areas
 
 #### prefix
 - String
