@@ -99,6 +99,8 @@ It would be nice to expose a more thought out interface for the VideoObject inst
 
 I could also do a better job of validating the required arguments. If an invalid container id is supplied the player will just error out. Same goes for the src – if the browser can't play the supplied video the player doesn't error out gracefully. 
 
+If you check out the heat map (and you should!) you may see some vertical white lines dispersed throughout. These come from pixel rounding. If you resize the browser you will see that they go away and return in different, random locations. If I were to build something like this for real, I'd probably visualize that data with D3 to canvas or some other canvas based solution.
+
 ### Support
 Since this is an HTML5 player, browsers that don't support html5 video will not display the video. Furthermore since I'm using .addEventListener directly this code would blow up on any broswer that didn't support it (ie8 comes to mind). I'm also using some css3 stuff ( like repeating-linear-gradient ). I can't imagine this working too well on tablets either. I did not factor in any touch event handlers. The player is only provided with one source tag for mp4 format, so this wont work on any browsers that don't support that format ( know old firefox doesn't – are they still only OGG? )
 
