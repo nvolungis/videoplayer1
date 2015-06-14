@@ -3,7 +3,7 @@ Hi ladies and gents! Below are my thoughts on the video player project. I found 
 
 #### Developed on and tested against chrome =]=]
 
-## Most challenging Aspects
+## Most challenging aspects
 
 ### 1 - Making the play head draggable
 
@@ -14,7 +14,7 @@ It took lots of playing around and sketches to figure out what was actually happ
 The biggest issue here was determining what constituted a view-segment and then accurately recording them. I arrived at the following definition: anything recorded between a play event and a pause/stop event is a view-segment. Since I hooked the analyzer up to the 'timeChanged' event I was receiveing more info that I actually wanted. For instance, whenever the play head is dragged the currentTime attribute of the video is updated which results in a 'timeChanged' event. Since these events aren't coming from organic play, the analyzer needs to know to ignore them. Then when the video starts playing normally it needs to be told to pay attention again. Getting this just right was challenging. 
 
 
-### 3 - Determining the best way to derive meaning from those segments.
+### 3 - Determining the best way to derive meaning from those segments
 
 My initial approach to the analytics problem was to compare view-segments to each other, detecting their overlapping portions, and using that data to build a table which I could then further analyze. The issue with this however is that not only did I have to detect *IF* they overlapped, I also had to detect by how much, where exactly that overlap was in time, and ultimately how many other segments were already overlapping in that space. That seemed really messy, and it also didn't seem like it would scale well – What if I wanted to know what percentage of the video was viewed 3 times? n times?
 
