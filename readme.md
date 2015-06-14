@@ -6,8 +6,30 @@ Hi ladies and gents! Below are my thoughts on the video player project. I found 
 ## How to use it
 
 ```
-var videoplayer = embedvideo(src, container, options)
-```
+<html>
+  <head>
+    <link rel="stylesheet" href="neilsplayer.css" />
+  <head>
+  
+  <body>
+    <div id='player'></div>
+    
+    <script src="neilsplayer.js"></script>
+    <script type="text/javascript">
+      document.addEventListener('DOMContentLoaded', function(){ 
+        var src, options, player;
+        
+        src = 'https://embed-ssl.wistia.com/deliveries/9d1b76aa6e0d90c8bae735bf7d2737d0135053b5/file.mp4'
+        options = {
+          showStats: true
+        }
+        
+        player = embedvideo(src, 'player', options);
+      });
+    </script>
+  </body>
+</html>
+  
 
 ### Required arguments
 #### src
