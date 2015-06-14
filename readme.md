@@ -85,7 +85,6 @@ It took lots of playing around and sketches to figure out what was actually happ
 
 The biggest issue here was determining what constituted a view-segment and then accurately recording them. I arrived at the following definition: anything recorded between a play event and a pause/stop event is a view-segment. Since I hooked the analyzer up to the 'timeChanged' event I was receiveing more info that I actually wanted. For instance, whenever the play head is dragged the currentTime attribute of the video is updated which results in a 'timeChanged' event. Since these events aren't coming from organic play, the analyzer needs to know to ignore them. Then when the video starts playing normally it needs to be told to pay attention again. Getting this just right was challenging. 
 
-
 ### 3 - Determining the best way to derive meaning from those segments
 
 My initial approach to the analytics problem was to compare view-segments to each other, detecting their overlapping portions, and using that data to build a table which I could then further analyze. The issue with this however is that not only did I have to detect *IF* they overlapped, I also had to detect by how much, where exactly that overlap was in time, and ultimately how many other segments were already overlapping in that space. That seemed really messy, and it also didn't seem like it would scale well – What if I wanted to know what percentage of the video was viewed 3 times? n times?
@@ -120,6 +119,8 @@ During development I built each of the modules independently in their own files,
 It would be nice to expose a more thought out interface for the VideoObject instance returned by the embedvideo function. Adding play, pause, stop, and volume would be at the top of the list so another program could control the player. Adding destroy methods to all my objects would also be a huge win for people embedding in SPAs. 
 
 I could also do a better job of validating the required arguments. If an invalid container id is supplied the player will just error out. Same goes for the src – if the browser can't play the supplied video the player doesn't error out gracefully. 
+
+The buffer progress bar width reflects the largest buffer.end(n) value found. I initially tried aggregating all the buffer timeRange objects attached to the video tag, but that didn't give me the desired behavior. Given more time I'd look more into how to make this more accurate.
 
 If you check out the heat map (and you should!) you may see some vertical white lines dispersed throughout. These come from pixel rounding. If you resize the browser you will see that they go away and return in different, random locations. If I were to build something like this for real, I'd probably visualize that data with D3 to canvas or some other canvas based solution.
 
