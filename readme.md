@@ -153,10 +153,9 @@ This looks like 2n, or O(n) for each 'timeChanged' event to me.
 
 The player is built in a way to allow for multiple embeds on a single page. You can even pass them the same containerid!
 
-Changing the target rewatch percentage is very easy. The player will default to 25%, but it can be changed by passing a rewatchPercentage in the options object.
+Changing the target rewatch percentage is very easy. The player will default to 25%, but it can be changed by passing a rewatchThreshold value in the options object.
 
 The player performs well on short and medium length videos. I have not tested a four hour long video but I have no reason to believe there would be issues. My implementation of the heat map may break down given an extraordinary amount of moments due to limitations with the DOM, but as discussed earlier it was just a proof of concept. 
-
 
 
 ### Thank you!!
