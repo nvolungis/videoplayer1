@@ -36,7 +36,7 @@ the url of the video in mp4 format
 
 #### rewatchTreshold
 - Integer
-- from 0 to 100
+- from 1 to 100
 - default 25
 - the percentage of the video rewatched required to trigger a thresholdExceeded event
 
