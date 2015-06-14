@@ -149,6 +149,15 @@ number of moments (n) (during comparison against current segment) + number of mo
 
 This looks like 2n, or O(n) for each 'timeChanged' event to me. 
 
+## Modularity / Flexibility
+
+The player is built in a way to allow for multiple embeds on a single page. You can even pass them the same containerid!
+
+Changing the target rewatch percentage is very easy. The player will default to 25%, but it can be changed by passing a rewatchPercentage in the options object.
+
+The player performs well on short and medium length videos. I have not tested a four hour long video but I have no reason to believe there would be issues. My implementation of the heat map may break down given an extraordinary amount of moments due to limitations with the DOM, but as discussed earlier it was just a proof of concept. 
+
+
 
 ### Thank you!!
 This was a great project and I feel like it really let's you see how I code and what I'm about. My number one goal when I'm writing code is to make it as understandable and readable as possible (it's also nice if it actually does stuff!) and I hope that comes through in this project. I can't wait to hear what you have to say about it!
