@@ -1,6 +1,7 @@
 # Wistia Video Player
 Hi ladies and gents! Below are my thoughts on the video player project. I found it fun, challeneging, and think we got a pretty cool player out of it. 
 
+#### Developed on and tested against chrome =]=]
 
 ## Most challenging Aspects
 
@@ -10,13 +11,14 @@ It took lots of playing around and sketches to figure out what was actually happ
 
 ### 2 - Building the segments representing continuous views
 
-The biggest issue here was determining what constituted a view-segment and then accurately recording them. I arrived at a definiton that was: anything recorded between a play event and a pause/stop event is a view-segment. In the player, events are flying around frequently – sometimes many a second. I like using events to communicate between different modules in my code, but this time I had so many events and their ordering was so important that I actually got burned by the technique. The logical order that I assumed the callbacks would fire in did not end up being a reality. Not sure if it was an issue with the event loop, my event dispatcher or just my logic, but my "end segment" event was arriving too late to yeild the correct result. In the interest of time I decided to just change the way I was dispatching the event, moving those important callbacks into direct method invokations solved the problem. I would like to look into it a bit further though. 
+The biggest issue here was determining what constituted a view-segment and then accurately recording them. I arrived at the following definition: anything recorded between a play event and a pause/stop event is a view-segment. Since I hooked the analyzer up to the 'timeChanged' event I was receiveing more info that I actually wanted. For instance, whenever the play head is dragged the currentTime attribute of the video is updated which results in a 'timeChanged' event. Since these events aren't coming from organic play, the analyzer needs to know to ignore them. Then when the video starts playing normally it needs to be told to pay attention again. Getting this just right was challenging. 
+
 
 ### 3 - Determining the best way to derive meaning from those segments.
 
-My initial approach to the analytics problem was to compare continuously viewed segments (we'll call them *view-segments*) to each other, detecting their overlapping portions, and using that data to build a table which I could then further analyze. The issue with this however is that not only did I have to detect *IF* they overlapped, I also had to detect by how much, where exactly that overlap was in time, and ultimately how many other segments were already overlapping in that space. That seemed really messy, and it also didn't seem like it would scale well – What if I wanted to know what percentage of the video that was viewed 3 times? n times?
+My initial approach to the analytics problem was to compare view-segments to each other, detecting their overlapping portions, and using that data to build a table which I could then further analyze. The issue with this however is that not only did I have to detect *IF* they overlapped, I also had to detect by how much, where exactly that overlap was in time, and ultimately how many other segments were already overlapping in that space. That seemed really messy, and it also didn't seem like it would scale well – What if I wanted to know what percentage of the video was viewed 3 times? n times?
 
-Then I started thinking – it's not really overlaps that we care about here, its whether a specific moment was viewed or not. I could keep track of all the moments in the video in the form of segments which we'll call *moment-segments* (start of the moment to end of the moment) then if a moment-segment overlapped a view-segment, we'd know that moment was watched! Detecting the overlaps was easy because we could just test if they don't overlap, then return the inverse. Better still, detecting different numbers of rewatches became trivial – any time an overlap was detected, we'd just increment that moment's play count! 
+Then I started thinking – it's not really overlaps that we care about here, it's whether a specific moment was viewed or not. I could keep track of all the moments in the video in the form of moment-segments (start of the moment to end of the moment) then if a moment-segment overlapped a view-segment, we'd know that moment was watched! Detecting the overlaps was easy because we could just test if they don't overlap, then return the inverse. Better still, detecting different numbers of rewatches became trivial – any time an overlap was detected, we'd just increment that moment's play count! 
 
 To get a percentage of moments watched n times, just find all moments with a play count >= n and divide by the total number of moments. 
 
@@ -36,10 +38,10 @@ To figure out what was happeneing I created a minimal test case reproducing the 
 
 
 ### What was new to me
-Prior to this project I had limited experience with the video tag. I essentially only used it for background videos on websites and didn't much care about anything other than its canplay event. For this project I had to deal with lots more methods and learn more about how video loads and plays. I also hadn't built an algorithm to collect information like this – most of the time I'm dealing problems more concerned with UI and not raw data. Getting rid of jQuery was also a new and surprisingly rewarding experience. 
+Prior to this project I had limited experience with the video tag. I essentially only used it for background videos on websites and didn't much care about anything other than it's canplay event. For this project I had to deal with lots more methods and learn more about how video loads and plays. I also hadn't built an algorithm to collect information like this – most of the time I'm dealing with problems more concerned with UI and not raw data. Getting rid of jQuery was also a new and surprisingly rewarding experience. 
 
 ### What I would change
-I'm always driving toward more modular code with logically derived boundaries. I think I did an okay job here, but something that kept bugging me was how I was passing options down from the main module to sub modules. On some ocassions, I'm passing options through 4 modules. Not sure what could be done about it, perhaps I need to make my module structure flatter vs. deeper. 
+I'm always driving toward more modular code with logically derived boundaries. I think I did an okay job here, but something that kept bugging me was how I was passing options down from the main module to sub modules. On some ocassions, I'm passing options through 4 modules. Not sure what could be done about it, perhaps I need to make my module structure flatter vs. deeper. I'd love to hear your thoughts on my overall structure!
 
 During development I built each of the modules independently in their own files, then used a build system to concatenate them together. If I had a little more time, I would have tweaked the build to export each module onto a non-global object, then only expose the embedvideo function to the window. Reducing the number of objects on the window is always good. 
 
@@ -54,7 +56,7 @@ Since this is an HTML5 player, browsers that don't support html5 video will not 
   
 - Get the legnth of the video and slice it up into x-length segments (called moments in my code)
 - Create an object for each moment with a start, end, plays, and index property
-- shove them an an array.
+- shove them on an array.
 
 
 #### Run Time
@@ -73,7 +75,14 @@ This would equal O(Cn), or just O(n)
 - when watching is interupted (pause, stop, playehead drag, playbar click) add it's watched moments to the aggregate record of watched moments.
 
 #### Run Time
-number of moments (n —  comparison against segment) + number of moments (n —  summation) 
+number of moments (n) (during comparison against current segment) + number of moments (n) ( summation against aggregate moment data) + C (number moments watched / total moments)
 
 This looks like 2n, or O(n) for each 'timeChanged' event to me. 
+
+
+### Thank you!!
+
+This was a great project and I feel like it really let's you see how I code and what I'm about. My number one goal when I'm writing code is to make it as understandable and readable as possible (it's also nice if it actually does stuff!) and I hope that comes through in this project. I can't wait to hear what you have to say about it!
+
+- Neil
 
