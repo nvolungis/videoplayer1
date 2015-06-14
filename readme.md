@@ -5,23 +5,25 @@ Hi ladies and gents! Below are my thoughts on the video player project. I found 
 
 ## How to use it
 
+```
 var videoplayer = embedvideo(src, container, options)
+```
 
 ### Required arguments
-**src** - String
+#### src
+- String
+- the url of the video in mp4 format    
 
-the url of the video in mp4 format    
-
-**container** - String - the id of the container to append the video to 
+#### container 
+- String 
+- the id of the container to append the video to 
 
 ### Options
-
 #### granularity 
 - Double
 - .01 to 1.0
 - default .5 
 - the number of segments / second to split the video into for analytics
-
 
 #### autoplay
 - Boolean
