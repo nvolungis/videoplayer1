@@ -1,5 +1,5 @@
 # Wistia Video Player
-Hi ladies and gents! Below are my thoughts on the video player project. I found it fun, challeneging, and think we got a pretty cool player out of it. 
+Hi ladies and gents! Below are my thoughts on the video player project. I found it fun, challenging, and think we got a pretty cool player out of it. 
 
 #### Developed on and tested against chrome =]=]
 
@@ -85,4 +85,3 @@ This looks like 2n, or O(n) for each 'timeChanged' event to me.
 This was a great project and I feel like it really let's you see how I code and what I'm about. My number one goal when I'm writing code is to make it as understandable and readable as possible (it's also nice if it actually does stuff!) and I hope that comes through in this project. I can't wait to hear what you have to say about it!
 
 - Neil
-
