@@ -3,6 +3,16 @@
  * Creates a new VideoPlayer object
  * returns the VideoPlayer object.
  *
+ * Required args:
+ *
+ * src - String
+ *   the url of the video in mp4 format
+ *
+ * container - String
+ *   the id of the container to append the video to
+ *
+ *
+ *
  * Options:
  *
  * granularity - Double

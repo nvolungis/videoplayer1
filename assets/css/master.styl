@@ -1,11 +1,12 @@
-@import '_settings'
-
-normalize-css()
-base()
-
 height = 40px
+progressBackgroundColor = rgba(255, 255, 255, .3)
+progressForegroundColor = rgba(255, 255, 255, .2)
 
-.neils-video-container
+.neils-video-embed-container
+  font-family sans-serif
+  color #888
+
+.neils-video-vid-container
   position relative
 
   video
@@ -13,38 +14,66 @@ height = 40px
     display block 
 
 .neils-video-play-bar
-  position relative
+  position absolute
   width 100%
   height height
   box-sizing border-box
   overflow hidden
   cursor pointer
+  bottom 0
+  background rgba(255, 255, 255, .3)
+  opacity 0
+  transition opacity 300ms ease
 
-.neils-video-play-bar-positioner
+.neils-video-vid-container:hover
+  .neils-video-play-bar
+    opacity 1
+
+.neils-video-play-bar-loaded-container
   position absolute
-  left 10px
-  right 10px
-  height 100%
+  top 5px
+  bottom 5px
+  left 5px
+  right 5px
 
-  &:before
-    content ''
-    display block
-    position absolute
-    height 100%
-    left -10px
-    width 10px
-    background rgba(0, 0, 0, .5)
+.neils-video-play-bar-loaded
+  position absolute
+  left 0
+  top 0
+  bottom 0
+  box-sizing border-box
+  background rgba(255, 255, 255, .3)
+  z-index 1
+
+.neils-video-progress-bar-container
+  position absolute
+  top 0
+  left 0
+  bottom 0
 
 .neils-video-progress-bar
   position absolute
   left 0
   height 100%
-  background rgba(0, 0, 0, .5)
+  background: repeating-linear-gradient( 
+    -45deg, 
+    progressForegroundColor, 
+    progressForegroundColor 5%, 
+    shade(progressForegroundColor, 5%) 5%, 
+    shade(progressForegroundColor, 5%) 10%, 
+    progressBackgroundColor 10%) top left fixed;
+  background-size 40px 40px
+  z-index 2
+
+.neils-video-play-bar-embelishement
+  position: absolute;
+
+
 
 .neils-video-play-head
   position absolute
   height 100%
-  background black
+  background rgba(255, 255, 255, .8)
   cursor grab
 
   &[data-is-dragging="true"]
@@ -57,6 +86,8 @@ height = 40px
   height 100%
   line-height height
   color white
+  user-select none
+  text-shadow 0 0 3px rgba(0,0,0,.5)
 
 .neils-video-heatmap
   position relative
@@ -91,3 +122,6 @@ height = 40px
 
   &.exceeded
     color red
+
+.neils-video-aux-container
+  padding 5px

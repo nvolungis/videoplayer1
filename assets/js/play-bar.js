@@ -29,6 +29,7 @@
       this.playHead.addEventListener('click',     this.onPlayHeadClick.bind(this));
       this.playBar.addEventListener('click',      this.onPlayBarClick.bind(this));
       this.on('video:made:progress',              this.onVideoProgress.bind(this));
+      this.on('buffer:made:progress',             this.onBufferMadeProgress.bind(this));
       window.addEventListener('mouseup',          this.onMouseup.bind(this));
     },
 
@@ -60,6 +61,8 @@
         playerWidth: this.container.offsetWidth,
         playerOffsetX: this.container.getBoundingClientRect().left,
         playHeadWidth: this.playHead.offsetWidth,
+        playHeadLabelRightX: this.playHeadLabel.getBoundingClientRect().right,
+        playHeadLabelWidth: this.playHeadLabel.offsetWidth,
         clientX:e.clientX,
         offsetX:e.offsetX,
         gutter: this.playHeadWidth / 2
@@ -87,6 +90,10 @@
       this.updateProgressBar(data.percentage);
     },
 
+    onBufferMadeProgress: function(e, progress){
+      this.playBarLoaded.style.width = progress + '%';
+    },
+
     updateProgressBar: function(percentage){
       var style = this.progressBar.style;
       style.width = percentage + '%';
@@ -102,22 +109,26 @@
     },
 
     embedPlayBar: function(){
-      var playBar           = document.createElement('div'),
-          playBarPositioner = document.createElement('div'),
-          progressBar       = document.createElement('div'),
-          playHead          = document.createElement('div'),
-          playHeadLabel     = document.createElement('div');
+      var playBar                = document.createElement('div'),
+          playBarLoaded          = document.createElement('div'),
+          playBarLoadedContainer = document.createElement('div'),
+          progressBar            = document.createElement('div'),
+          progressBarContainer   = document.createElement('div'),
+          playHead               = document.createElement('div'),
+          playHeadLabel          = document.createElement('div');
 
       playBar.setAttribute('class', this.prefix + '-play-bar');
       this.playBar = playBar;
 
-      playBarPositioner.setAttribute( 'class', this.prefix + '-play-bar-positioner');
+      playBarLoaded.setAttribute( 'class', this.prefix + '-play-bar-loaded');
+      this.playBarLoaded = playBarLoaded;
 
-      progressBar.setAttribute('class', this.prefix + '-progress-bar');
+      playBarLoadedContainer.setAttribute('class', this.prefix + '-play-bar-loaded-container');
+      playBarLoadedContainer.appendChild(playBarLoaded);
 
       playHead.setAttribute('class', this.prefix + '-play-head');
       playHead.style.width = this.playHeadWidth + 'px';
-      playHead.style.right = - (this.playHeadWidth / 2) + 'px';
+      playHead.style.right = - this.playHeadWidth + 'px';
       this.playHead = playHead;
 
       playHeadLabel.setAttribute('class', this.prefix + '-play-head-label');
@@ -125,11 +136,16 @@
       this.playHeadLabel.style.right = (this.playHeadWidth) + 'px';
       playHead.appendChild(playHeadLabel);
 
+      progressBar.setAttribute('class', this.prefix + '-progress-bar');
       progressBar.appendChild(playHead);
       this.progressBar = progressBar;
 
-      playBarPositioner.appendChild(progressBar);
-      playBar.appendChild(playBarPositioner);
+      progressBarContainer.setAttribute('class', this.prefix + '-progress-bar-container');
+      progressBarContainer.style.right = this.playHeadWidth + 'px';
+      progressBarContainer.appendChild(progressBar);
+
+      playBar.appendChild(progressBarContainer);
+      playBar.appendChild(playBarLoadedContainer);
       this.container.appendChild(playBar);
     }
   });

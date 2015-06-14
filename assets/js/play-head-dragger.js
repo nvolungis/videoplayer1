@@ -10,20 +10,26 @@
 
 
 (function(utils, window){
+
   function PlayHeadDragger(envData){
     this.currentPercentage = 0;
     this.envData           = envData;
 
+    this.init();
     this.bind();
   }
 
   utils.extend(PlayHeadDragger.prototype, utils.emitter, {
+    init: function(){
+      this._onMouseMove = this.onMouseMove.bind(this);
+    },
+
     bind: function(){
-      window.addEventListener('mousemove', this.onMouseMove.bind(this));
+      window.addEventListener('mousemove', this._onMouseMove);
     },
 
     unbind: function(){
-      window.removeEventListener('mousemove');
+      window.removeEventListener('mousemove', this._onMouseMove);
     },
 
     onMouseMove: function(e){
@@ -40,8 +46,8 @@
     },
 
     getPercentage: function(clientX){
-      var adjustedClientX = (this.envData.gutter - this.envData.offsetX) + clientX,
-          numerator       = adjustedClientX - (this.envData.playerOffsetX + this.envData.gutter),
+      var adjustedClientX = this.getAdjustedClientX(clientX),
+          numerator       = adjustedClientX - (this.envData.playerOffsetX),
           denominator     = this.envData.playerWidth - (this.envData.gutter * 2),
           percentage      = (numerator / denominator) * 100;
 
@@ -52,6 +58,19 @@
       }
 
       return percentage;
+    },
+
+    getAdjustedClientX: function(clientX){
+      var adjustedClientX = (-this.envData.offsetX) + clientX,
+          leftOfPlayhead = this.envData.playHeadLabelRightX - (this.envData.clientX),
+          offset;
+
+      if(leftOfPlayhead > 0){
+        offset = this.envData.playHeadLabelWidth;
+        adjustedClientX += offset;
+      }
+
+      return adjustedClientX;
     },
 
     destroy: function(){

@@ -6,10 +6,11 @@ document.addEventListener('DOMContentLoaded', function(){
 
    options = {
      rewatchThreshold: 10,
-     showStats: false,
+     showStats: true,
      autoplay: true, 
      volume: 0
    };
 
    videoplayer  = embedvideo(src1, 'video1', options);
+   videoplayer2 = embedvideo(src2, 'video1', options);
 });

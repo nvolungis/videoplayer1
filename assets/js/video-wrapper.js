@@ -29,6 +29,7 @@
       this.nativeVideoEl.addEventListener('pause',      this.onPause.bind(this));
       this.nativeVideoEl.addEventListener('stop',       this.onStop.bind(this));
       this.nativeVideoEl.addEventListener('click',      this.onVideoTagClick.bind(this));
+      this.nativeVideoEl.addEventListener('progress',   this.onBufferProgress.bind(this));
     },
 
     onVideoTagClick: function(){
@@ -51,6 +52,21 @@
         currentTime: this.nativeVideoEl.currentTime,
         percentage: percentage
       });
+    },
+
+    onBufferProgress: function(){
+      var buffer     = this.nativeVideoEl.buffered,
+          len        = buffer.length,
+          largestEnd = 0;
+
+      for(i=0; i<len; i+=1){
+        if(buffer.end(i) > largestEnd){
+          largestEnd = buffer.end(i);
+        }
+      }
+
+      percentage = (largestEnd / this.nativeVideoEl.duration) * 100;
+      this.trigger('buffer:updated', percentage);
     },
 
     onPlay: function(){
@@ -91,9 +107,24 @@
       return this.nativeVideoEl.currentTime / this.videoLength * 100;
     },
 
+    getAuxContainer: function(){
+      return this.auxContainer;
+    },
+
+    getVidContainer: function(){
+      return this.vidContainer;
+    },
+
+    getEmbedContainer: function(){
+      return this.embedContainer;
+    },
+
     embedVideo: function(){
-      var videoTag = document.createElement('video'),
-          videoSrc = document.createElement('source');
+      var videoTag       = document.createElement('video'),
+          videoSrc       = document.createElement('source'),
+          auxContainer   = document.createElement('div'),
+          vidContainer   = document.createElement('div'),
+          embedContainer = document.createElement('div');
 
       if(this.options.autoplay){
         videoTag.setAttribute('autoplay', 1);
@@ -105,8 +136,20 @@
 
       videoTag.appendChild(videoSrc);
 
-      this.container.appendChild(videoTag);
-      this.nativeVideoEl = this.container.querySelector('video')
+      vidContainer.setAttribute('class', this.options.prefix + '-vid-container');
+      vidContainer.appendChild(videoTag);
+      this.vidContainer = vidContainer;
+
+      auxContainer.setAttribute('class', this.options.prefix + '-aux-container');
+      this.auxContainer = auxContainer;
+
+      embedContainer.setAttribute('class', this.options.prefix + '-embed-container');
+      embedContainer.appendChild(vidContainer);
+      embedContainer.appendChild(auxContainer);
+      this.embedContainer = embedContainer;
+
+      this.container.appendChild(embedContainer);
+      this.nativeVideoEl = videoTag;
     }
   });
 

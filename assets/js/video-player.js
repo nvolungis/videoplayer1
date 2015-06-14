@@ -45,7 +45,8 @@
     this.options    = this.getDefaultOptions(options);
     this.video      = new VideoWrapper(this.src, this.container, {
       autoplay: this.options.autoplay,
-      volume: this.options.volume
+      volume: this.options.volume,
+      prefix: this.options.prefix
     });
 
     this.video.on('can:play', function(){
@@ -56,8 +57,8 @@
 
   utils.extend(VideoPlayer.prototype, {
     init: function(){
-      this.playbar  = new PlayBar(this.options.prefix, this.container);
-      this.analyzer = new PlaybackAnalyzer(this.video.videoLength, this.container, {
+      this.playbar  = new PlayBar(this.options.prefix, this.video.getVidContainer());
+      this.analyzer = new PlaybackAnalyzer(this.video.videoLength, this.video.getAuxContainer(), {
         granularity: this.options.granularity,
         prefix: this.options.prefix,
         showStats: this.options.showStats,
@@ -73,6 +74,7 @@
       this.video.on('stop',                   this.onStop.bind(this));
       this.video.on('current:time:changed',   this.onCurrentTimeChanged.bind(this));
       this.video.on('video:duration:updated', this.onVideoDurationUpdate.bind(this));
+      this.video.on('buffer:updated',         this.onBufferUpdated.bind(this));
       this.playbar.on('play:head:dragged',    this.onPlayHeadDragged.bind(this));
       this.playbar.on('play:head:startdrag',  this.onPlayHeadStartDrag.bind(this));
       this.playbar.on('play:head:enddrag',    this.onPlayHeadEndDrag.bind(this));
@@ -107,6 +109,10 @@
     onCurrentTimeChanged: function(e, data){
       this.analyzer.record(data);
       this.playbar.trigger('video:made:progress', data)
+    },
+
+    onBufferUpdated: function(e, progress){
+      this.playbar.trigger('buffer:made:progress', progress);
     },
 
     onPlay: function(){
